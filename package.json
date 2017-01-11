@@ -1,0 +1,7 @@
+{
+  "name": "kc-auto",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Matt Wong <matt.wong.rpi@gmail.com>",
+  "license": "MIT"
+}
