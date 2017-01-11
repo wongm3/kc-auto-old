@@ -4,4 +4,16 @@
   border-bottom: 1px solid #1e64cf;
   -webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
+  .navbar-brand {
+    font-family: "Raleway", sans-serif;
+    color: #ffffff;
+    -webkit-transition: 0.1s linear;
+    transition: 0.1s linear;
+    &:hover {
+      color: #ffffff;
+    }
+    span {
+      font-weight: 700;
+    }
+  }
 }

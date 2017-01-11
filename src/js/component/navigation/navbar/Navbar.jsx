@@ -1,6 +1,7 @@
 import React from 'react';
 import {elementType} from 'react-prop-types';
 import NavbarHeader from './NavbarHeader';
+import NavbarBrand from './NavbarBrand';
 
 const propTypes = {
     componentClass: elementType
@@ -19,5 +20,6 @@ const Navbar = ({componentClass: Component, ...props}) => (
 Navbar.propTypes = propTypes;
 Navbar.defaultProps = defaultProps;
 Navbar.Header = NavbarHeader;
+Navbar.Brand = NavbarBrand;
 
 export default Navbar;
