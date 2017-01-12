@@ -1,0 +1,15 @@
+#sidebar {
+  position: fixed;
+  width: 250px;
+  top: 51px;
+  bottom: 0px;
+  z-index: 1000;
+  background: #333332;
+  font-size: 0.9em;
+  font-weight: normal;
+  -webkit-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
+  -moz-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
+  box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
+  overflow: auto;
+  padding-bottom: 20px;
+}
