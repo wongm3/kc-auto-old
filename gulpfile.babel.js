@@ -109,6 +109,10 @@ gulp.task('webpack-dev-server', () => {
     })
 });
 
+gulp.task('listen', () => {
+    gulp.watch(paths.styles.input, ['clean:dist', 'build:styles'])
+});
+
 /**
  * Task Runners
  */
@@ -125,3 +129,5 @@ gulp.task('default', [
     'build:styles',
     'webpack-dev-server'
 ]);
+
+gulp.task('watch', ['listen', 'build']);
