@@ -28,6 +28,7 @@ let paths = {
         bootstrap: 'node_modules/bootstrap-sass/assets/stylesheets',
         fontawesome: 'node_modules/font-awesome/scss',
         input: 'src/css/app.scss',
+        dir: 'src/css/**/*',
         output: 'dist/css'
     },
     fonts: {
@@ -109,6 +110,10 @@ gulp.task('webpack-dev-server', () => {
     })
 });
 
+gulp.task('listen', () => {
+    gulp.watch(paths.styles.dir, ['clean:dist', 'build:styles'])
+});
+
 /**
  * Task Runners
  */
@@ -125,3 +130,5 @@ gulp.task('default', [
     'build:styles',
     'webpack-dev-server'
 ]);
+
+gulp.task('watch', ['listen', 'build']);
