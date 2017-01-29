@@ -4,7 +4,9 @@
 
 // General
 import del from 'del';
+import eslint from 'gulp-eslint';
 import gulp from 'gulp';
+import gulpIf from 'gulp-if';
 import gutil from 'gulp-util';
 import rename from 'gulp-rename';
 
@@ -23,19 +25,23 @@ import webpackConfig from './webpack.config';
  */
 
 let paths = {
-    output: 'dist/**/*',
-    styles: {
-        bootstrap: 'node_modules/bootstrap-sass/assets/stylesheets',
-        fontawesome: 'node_modules/font-awesome/scss',
-        input: 'src/css/app.scss',
-        dir: 'src/css/**/*',
-        output: 'dist/css'
-    },
-    fonts: {
-        bootstrap: 'node_modules/bootstrap-sass/assets/fonts/**/*',
-        fontawesome: 'node_modules/font-awesome/fonts/**/*',
-        output: 'dist/fonts/'
-    }
+  output: 'dist/**/*',
+  styles: {
+    bootstrap: 'node_modules/bootstrap-sass/assets/stylesheets',
+    fontawesome: 'node_modules/font-awesome/scss',
+    input: 'src/css/app.scss',
+    dir: 'src/css/**/*',
+    output: 'dist/css'
+  },
+  fonts: {
+    bootstrap: 'node_modules/bootstrap-sass/assets/fonts/**/*',
+    fontawesome: 'node_modules/font-awesome/fonts/**/*',
+    output: 'dist/fonts/'
+  },
+  scripts: {
+    input: 'src/js/**/*',
+    dir: 'src/js'
+  }
 };
 
 /**
@@ -44,74 +50,90 @@ let paths = {
 
 // Process, and minify Sass files
 gulp.task('build:styles', ['build:fonts'], () => gulp.src(paths.styles.input)
-    .pipe(sass({
-        includePaths: [
-            paths.styles.bootstrap,
-            paths.styles.fontawesome
-        ]
-    }))
-    .pipe(prefix({
-        browsers: ['last 2 version', '> 1%'],
-        cascade: true,
-        remove: true
-    }))
-    .pipe(gulp.dest(paths.styles.output))
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(minify({
-        discardComments: {
-            removeAll: true
-        }
-    }))
-    .pipe(gulp.dest(paths.styles.output))
+  .pipe(sass({
+    includePaths: [
+      paths.styles.bootstrap,
+      paths.styles.fontawesome
+    ]
+  }))
+  .pipe(prefix({
+    browsers: ['last 2 version', '> 1%'],
+    cascade: true,
+    remove: true
+  }))
+  .pipe(gulp.dest(paths.styles.output))
+  .pipe(rename({suffix: '.min'}))
+  .pipe(minify({
+    discardComments: {
+      removeAll: true
+    }
+  }))
+  .pipe(gulp.dest(paths.styles.output))
 );
 
 gulp.task('build:fonts', ['build:fonts:bootstrap', 'build:fonts:fontawesome']);
 
 // Bootstrap fonts
 gulp.task('build:fonts:bootstrap', () => gulp.src(paths.fonts.bootstrap)
-    .pipe(gulp.dest(paths.fonts.output))
+  .pipe(gulp.dest(paths.fonts.output))
 );
 
 // Font Awesome fonts
 gulp.task('build:fonts:fontawesome', () => gulp.src(paths.fonts.fontawesome)
-    .pipe(gulp.dest(paths.fonts.output))
+  .pipe(gulp.dest(paths.fonts.output))
 );
 
 gulp.task('build:webpack', (callback) => {
-    webpack(webpackConfig, (err, stats) => {
-        if (err) {
-            throw new gutil.PluginError('webpack:build', err);
-        }
-        gutil.log('[webpack:build]', stats.toString({
-            colors: true
-        }));
-        callback();
-    });
+  webpack(webpackConfig, (err, stats) => {
+    if (err) {
+      throw new gutil.PluginError('webpack:build', err);
+    }
+    gutil.log('[webpack:build]', stats.toString({
+      colors: true
+    }));
+    callback();
+  });
 });
 
 gulp.task('clean:dist', () => {
-    del.sync([
-        paths.output,
-        '!dist/index.html'
-    ])
+  del.sync([
+    paths.output,
+    '!dist/index.html'
+  ])
 });
 
 gulp.task('webpack-dev-server', () => {
-    new WebpackDevServer(webpack(webpackConfig), {
-        publicPath: "/" + webpackConfig.output.publicPath,
-        stats: {
-            colors: true
-        }
-    }).listen(8080, 'localhost', (err) => {
-        if (err) {
-            throw new gutil.PluginError('webpack-dev-server', err);
-        }
-        gutil.log('[webpack-dev-server]', 'http://localhost:8080/webpack-dev-server/index.html');
-    })
+  new WebpackDevServer(webpack(webpackConfig), {
+    publicPath: "/" + webpackConfig.output.publicPath,
+    stats: {
+      colors: true
+    }
+  }).listen(8080, 'localhost', (err) => {
+    if (err) {
+      throw new gutil.PluginError('webpack-dev-server', err);
+    }
+    gutil.log('[webpack-dev-server]', 'http://localhost:8080/webpack-dev-server/index.html');
+  })
 });
 
 gulp.task('listen', () => {
-    gulp.watch(paths.styles.dir, ['clean:dist', 'build:styles'])
+  gulp.watch(paths.styles.dir, ['clean:dist', 'build:styles'])
+});
+
+gulp.task('lint', () => (
+  gulp.src(paths.scripts.input)
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
+));
+
+gulp.task('lint:fix', () => {
+  gulp.src(paths.scripts.input)
+    .pipe(eslint({
+      fix: true
+    }))
+    .pipe(eslint.format())
+    .pipe(gulpIf(file => (file.eslint != null && file.eslint.fixed), gulp.dest(paths.scripts.dir), eslint.failAfterError()));
 });
 
 /**
@@ -120,15 +142,15 @@ gulp.task('listen', () => {
 
 // Production build
 gulp.task('build', [
-    'clean:dist',
-    'build:styles',
-    'build:webpack'
+  'clean:dist',
+  'build:styles',
+  'build:webpack'
 ]);
 
 gulp.task('default', [
-    'clean:dist',
-    'build:styles',
-    'webpack-dev-server'
+  'clean:dist',
+  'build:styles',
+  'webpack-dev-server'
 ]);
 
 gulp.task('watch', ['listen', 'build']);
